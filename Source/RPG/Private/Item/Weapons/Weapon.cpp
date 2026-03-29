@@ -1,9 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Item/Weapons/Weapon.h"
-#include "Characters/MainCharacter.h"
-#include "DebugMacros.h"
+#include "Items/Weapons/Weapon.h"
+
 
 void AWeapon::Equip(USceneComponent* InParent, FName InSocketName)
 {

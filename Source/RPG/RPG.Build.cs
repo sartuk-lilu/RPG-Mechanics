@@ -26,19 +26,17 @@ public class RPG : ModuleRules
 
 		PublicIncludePaths.AddRange(new string[] {
 			"RPG",
-			"RPG/Variant_Platforming",
-			"RPG/Variant_Platforming/Animation",
+			"RPG/Public",
+			"RPG/Public/Characters",
+			"RPG/Public/Items",
+			"RPG/Public/Debug",
+			"RPG/Public/Items/Weapons",
 			"RPG/Variant_Combat",
 			"RPG/Variant_Combat/AI",
 			"RPG/Variant_Combat/Animation",
 			"RPG/Variant_Combat/Gameplay",
 			"RPG/Variant_Combat/Interfaces",
-			"RPG/Variant_Combat/UI",
-			"RPG/Variant_SideScrolling",
-			"RPG/Variant_SideScrolling/AI",
-			"RPG/Variant_SideScrolling/Gameplay",
-			"RPG/Variant_SideScrolling/Interfaces",
-			"RPG/Variant_SideScrolling/UI"
+			"RPG/Variant_Combat/UI"
 		});
 
 		// Uncomment if you are using Slate UI

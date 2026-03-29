@@ -13,8 +13,8 @@
 #include "InputActionValue.h"
 #include "GroomComponent.h"
 #include "Math/UnrealMathUtility.h"
-#include "Item/Item.h"
-#include "Item/Weapons/Weapon.h"
+#include "Items/Item.h"
+#include "Items/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
 
 // Sets default values
@@ -159,7 +159,7 @@ void AMainCharacter::CharacterEquip(const FInputActionValue& Value)
 	}
 }
 
-void AMainCharacter::CharacterAttack(const FInputActionValue& Value)
+void AMainCharacter::PlayAttackMontage()
 {
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
@@ -170,17 +170,26 @@ void AMainCharacter::CharacterAttack(const FInputActionValue& Value)
 			FName SectionName = FName();
 			switch (Selection)
 			{
-				case 0:
-					SectionName = FName("Attack1");
-					break;
-				case 1:
-					SectionName = FName("Attack2");
-					break;
-				default:
-					break;
+			case 0:
+				SectionName = FName("Attack1");
+				break;
+			case 1:
+				SectionName = FName("Attack2");
+				break;
+			default:
+				break;
 			}
 			AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
 		}
+	}
+}
+
+void AMainCharacter::CharacterAttack(const FInputActionValue& Value)
+{
+	if (CharacterActionState == EActionState::EAS_Unoccupied)
+	{
+		PlayAttackMontage();
+		CharacterActionState = EActionState::EAS_Attacking;
 	}
 	
 }

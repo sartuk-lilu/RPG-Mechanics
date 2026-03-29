@@ -6,7 +6,6 @@
 #include "Components/SphereComponent.h"
 #include "Characters/MainCharacter.h"
 
-#include "DebugMacros.h"
 // Sets default values
 AItem::AItem()
 {
@@ -27,16 +26,6 @@ void AItem::BeginPlay()
 	
 	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnSphereOverlap);
 	Sphere->OnComponentEndOverlap.AddDynamic(this, &AItem::OnSphereEndOverlap);
-}
-
-float AItem::TransformedSin()
-{
-	return Amplitude * FMath::Sin(RunningTime * TimeConstant);
-}
-
-float AItem::TransformedCos()
-{
-	return Amplitude * FMath::Cos(RunningTime * TimeConstant);;
 }
 
 void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -62,6 +51,5 @@ void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	RunningTime += DeltaTime;
 	
 }

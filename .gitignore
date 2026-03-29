@@ -7,6 +7,7 @@ Config/
 Content/
 DerivedDataCache/
 Intermediate/
+Plugins/
 package/
 Saved/
 FeaturePacks/

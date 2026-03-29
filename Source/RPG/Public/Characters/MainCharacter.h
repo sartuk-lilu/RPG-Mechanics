@@ -46,7 +46,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	
-	
+	void PlayAttackMontage();
 	
 	/*------------------------------------------*/
 	/* MAPPING INPUT FOR THE MAIN CHARACTER */
@@ -96,7 +96,7 @@ protected:
 	
 	// Equip an Item on the main character
 	void CharacterEquip(const FInputActionValue& Value);
-	
+
 	//Attack
 	void CharacterAttack(const FInputActionValue& Value);
 	/*------------------------------------------*/
@@ -143,4 +143,7 @@ private:
 	UAnimMontage* AttackMontage;
 	
 	ECharacterState CharacterState = ECharacterState::ECS_Unarmed;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Montages", meta = (AllowPrivateAccess = "true"))
+	EActionState CharacterActionState = EActionState::EAS_Unoccupied;
 };
