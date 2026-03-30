@@ -85,26 +85,31 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMainCharacter::CharacterMovement);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMainCharacter::Movement);
 		
 		// Looking
-		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &AMainCharacter::CharacterMouseLooking);
+		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &AMainCharacter::MouseLooking);
 		
-		// MouseWheel Zooming
-		EnhancedInputComponent->BindAction(MouseWheelAction, ETriggerEvent::Triggered, this, &AMainCharacter::CharacterMouseWheel);
+		// MouseWheel Camera Zooming
+		EnhancedInputComponent->BindAction(MouseWheelAction, ETriggerEvent::Triggered, this, &AMainCharacter::MouseWheel);
 		
-		// Equip
-		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Started, this, &AMainCharacter::CharacterEquip);
+		// Taking an item
+		EnhancedInputComponent->BindAction(TakeItemAction, ETriggerEvent::Started, this, &AMainCharacter::TakeItem);
 		
-		//Attack
-		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &AMainCharacter::CharacterAttack);
+		//Attacking
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &AMainCharacter::Attack);
+		
+		//Equipping
+		EnhancedInputComponent->BindAction(EquipWeaponAction, ETriggerEvent::Started, this, &AMainCharacter::EquipWeapon);
+		
 	}
 }
-void AMainCharacter::CharacterMovement(const FInputActionValue& Value)
+void AMainCharacter::Movement(const FInputActionValue& Value)
 {
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
 	
+	if (ActionState != EActionState::Unoccupied) return;
+	
+	FVector2D MovementVector = Value.Get<FVector2D>();
 	if (GetController() != nullptr)
 	{
 		// find out which way is forward
@@ -123,7 +128,7 @@ void AMainCharacter::CharacterMovement(const FInputActionValue& Value)
 	}
 }
 
-void AMainCharacter::CharacterMouseLooking(const FInputActionValue& Value)
+void AMainCharacter::MouseLooking(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
@@ -136,7 +141,7 @@ void AMainCharacter::CharacterMouseLooking(const FInputActionValue& Value)
 	}
 }
 
-void AMainCharacter::CharacterMouseWheel(const FInputActionValue& Value)
+void AMainCharacter::MouseWheel(const FInputActionValue& Value)
 {
 	if (GetCameraBoom())
 	{
@@ -149,13 +154,14 @@ void AMainCharacter::CharacterMouseWheel(const FInputActionValue& Value)
 	}
 }
 
-void AMainCharacter::CharacterEquip(const FInputActionValue& Value)
+void AMainCharacter::TakeItem(const FInputActionValue& Value)
 {
 	if (AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem))
 	{
 		OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"));
 		MoveIgnoreActorAdd(OverlappingWeapon);
-		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+		CharacterState = ECharacterState::EquippedOneHandedWeapon;
+		EquippedWeapon = OverlappingWeapon;
 	}
 }
 
@@ -184,14 +190,80 @@ void AMainCharacter::PlayAttackMontage()
 	}
 }
 
-void AMainCharacter::CharacterAttack(const FInputActionValue& Value)
+void AMainCharacter::PlayEquipMontage()
 {
-	if (CharacterActionState == EActionState::EAS_Unoccupied)
+	if (!EquippedWeapon) return;
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		if (EquipMontage)
+		{
+			AnimInstance->Montage_Play(EquipMontage);
+			ActionState = EActionState::Equipping;
+			switch (CharacterState)
+			{
+			case ECharacterState::Unarmed:
+				AnimInstance->Montage_JumpToSection("Equip", EquipMontage);
+				CharacterState = ECharacterState::EquippedOneHandedWeapon;
+				break;
+			case ECharacterState::EquippedOneHandedWeapon:
+				AnimInstance->Montage_JumpToSection("Unequip", EquipMontage);
+				CharacterState = ECharacterState::Unarmed;
+				break;
+			default:
+				ActionState = EActionState::Unoccupied;
+				break;
+			}
+		}
+	}
+}
+
+void AMainCharacter::AttackEnd()
+{
+	ActionState = EActionState::Unoccupied;
+}
+
+void AMainCharacter::Disarm()
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("SpineSocket"));
+	}
+}
+
+void AMainCharacter::Arm()
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("RightHandSocket"));
+	}
+}
+
+void AMainCharacter::FinishEqupping()
+{
+	ActionState = EActionState::Unoccupied;
+}
+
+bool AMainCharacter::CanAttack() const
+{
+	return ActionState == EActionState::Unoccupied &&
+		CharacterState != ECharacterState::Unarmed &&
+			!GetCharacterMovement()->IsFalling(); 
+	
+}
+
+void AMainCharacter::Attack(const FInputActionValue& Value)
+{
+	if (CanAttack())
 	{
 		PlayAttackMontage();
-		CharacterActionState = EActionState::EAS_Attacking;
+		ActionState = EActionState::Attacking;
 	}
 	
+}
+
+void AMainCharacter::EquipWeapon(const FInputActionValue& Value)
+{
+	PlayEquipMontage();
 }
 
 void AMainCharacter::BeginPlay()

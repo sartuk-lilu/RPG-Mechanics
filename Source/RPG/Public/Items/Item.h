@@ -8,6 +8,12 @@
 
 class USphereComponent;
 
+enum class EItemState : uint8
+{
+	Hovering,
+	Equipped
+};
+
 UCLASS()
 class RPG_API AItem : public AActor
 {
@@ -25,7 +31,7 @@ protected:
 	virtual void OnSphereOverlap(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
-		UPrimitiveComponent* OtherOverlappedComponent,
+		UPrimitiveComponent* OtherOverlappedComponent, 
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult );
@@ -39,6 +45,8 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* ItemMesh;		
+	
+	EItemState EItemState = EItemState::Hovering;
 	
 private:
 	UPROPERTY(VisibleAnywhere)

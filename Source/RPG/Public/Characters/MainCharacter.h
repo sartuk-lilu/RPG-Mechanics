@@ -15,6 +15,7 @@ class UInputMappingContext;
 class UGroomComponent;
 class AItem;
 class UAnimMontage;
+class AWeapon;
 
 // Structures
 struct FInputActionValue;
@@ -27,10 +28,6 @@ class RPG_API AMainCharacter : public ACharacter
 public:
 	AMainCharacter();
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-		
 	
 	/*------------------------------------------*/
 	/* Getters and Setters */
@@ -42,20 +39,17 @@ public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) {OverlappingItem = Item; }
 	
 	FORCEINLINE ECharacterState GetCharacterState() const {return CharacterState; }
-	/*------------------------------------------*/
+
 protected:
 	virtual void BeginPlay() override;
-	
-	void PlayAttackMontage();
-	
+		
 	/*------------------------------------------*/
 	/* MAPPING INPUT FOR THE MAIN CHARACTER */
 	/*------------------------------------------*/
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputMappingContext* MainCharacterInputMapping;
-	/*------------------------------------------*/
-		
 	
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	/*------------------------------------------*/
 	/* ALL INPUT ACTIONS FOR THE MAIN CHARACTER */
@@ -72,36 +66,51 @@ protected:
 	// IA_MouseWheelZoom
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseWheelAction;
-	// IA_Equip
+	// IA_Take
 	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* EquipAction;
+	UInputAction* TakeItemAction;
 	// IA_Attack
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* AttackAction;
-	/*------------------------------------------*/
-	
+	// IA_EquipWeapon
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* EquipWeaponAction;
 	
 	
 	/*------------------------------------------*/
 	/* INPUT ACTION FUNCTIONS FOR THE MAIN CHARACTER */
 	/*------------------------------------------*/
-	// Movement
-	void CharacterMovement(const FInputActionValue& Value);
+	void Movement(const FInputActionValue& Value);
 
-	// MouseLooking
-	void CharacterMouseLooking(const FInputActionValue& Value);
-	
-	// Mouse Zooming
-	void CharacterMouseWheel(const FInputActionValue& Value);
-	
-	// Equip an Item on the main character
-	void CharacterEquip(const FInputActionValue& Value);
+	void MouseLooking(const FInputActionValue& Value);
 
-	//Attack
-	void CharacterAttack(const FInputActionValue& Value);
+	void MouseWheel(const FInputActionValue& Value);
+
+	void TakeItem(const FInputActionValue& Value);
+
+	void Attack(const FInputActionValue& Value);
+	
+	void EquipWeapon(const FInputActionValue& Value);
+	
 	/*------------------------------------------*/
+	/* Animation Montage */
+	/*------------------------------------------*/
+	void PlayAttackMontage();
+	void PlayEquipMontage();
 	
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
 	
+	UFUNCTION(BlueprintCallable)
+	void Disarm();
+	
+	UFUNCTION(BlueprintCallable)
+	void Arm();
+	
+	UFUNCTION(BlueprintCallable)
+	void FinishEqupping();
+	
+	bool CanAttack() const;
 	
 private:
 		
@@ -139,11 +148,18 @@ private:
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
 	
+	UPROPERTY(VisibleAnywhere, Category="Weapon")
+	AWeapon* EquippedWeapon;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Montages")
 	UAnimMontage* AttackMontage;
 	
-	ECharacterState CharacterState = ECharacterState::ECS_Unarmed;
+	UPROPERTY(EditDefaultsOnly, Category="Montages")
+	UAnimMontage* EquipMontage;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Montages", meta = (AllowPrivateAccess = "true"))
-	EActionState CharacterActionState = EActionState::EAS_Unoccupied;
+	ECharacterState CharacterState = ECharacterState::Unarmed;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Montages", meta = (AllowPrivateAccess = "true"))
+	EActionState ActionState = EActionState::Unoccupied;
 };
