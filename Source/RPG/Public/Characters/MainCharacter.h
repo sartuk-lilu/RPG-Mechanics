@@ -29,12 +29,13 @@ public:
 	AMainCharacter();
 	virtual void Tick(float DeltaTime) override;
 	
+	
 	/*------------------------------------------*/
 	/* Getters and Setters */
 	/*------------------------------------------*/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	
 	FORCEINLINE void SetOverlappingItem(AItem* Item) {OverlappingItem = Item; }
 	
@@ -106,11 +107,15 @@ protected:
 	
 	UFUNCTION(BlueprintCallable)
 	void Arm();
+		
+	bool CanAttack() const;
 	
 	UFUNCTION(BlueprintCallable)
-	void FinishEqupping();
+	void EquipFinished();
 	
-	bool CanAttack() const;
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponCollision(ECollisionEnabled::Type CollisionEnabled);
+
 	
 private:
 		

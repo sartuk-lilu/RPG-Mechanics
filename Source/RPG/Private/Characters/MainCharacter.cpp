@@ -16,6 +16,7 @@
 #include "Items/Item.h"
 #include "Items/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
+#include "Components/BoxComponent.h"
 
 // Sets default values
 AMainCharacter::AMainCharacter()
@@ -193,6 +194,8 @@ void AMainCharacter::PlayAttackMontage()
 void AMainCharacter::PlayEquipMontage()
 {
 	if (!EquippedWeapon) return;
+	if (GetCharacterMovement()->IsFalling()) return;
+	if (ActionState == EActionState::Attacking) return;
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
 		if (EquipMontage)
@@ -238,17 +241,25 @@ void AMainCharacter::Arm()
 	}
 }
 
-void AMainCharacter::FinishEqupping()
-{
-	ActionState = EActionState::Unoccupied;
-}
-
 bool AMainCharacter::CanAttack() const
 {
 	return ActionState == EActionState::Unoccupied &&
 		CharacterState != ECharacterState::Unarmed &&
 			!GetCharacterMovement()->IsFalling(); 
 	
+}
+
+void AMainCharacter::EquipFinished()
+{
+	ActionState = EActionState::Unoccupied;
+}
+
+void AMainCharacter::SetWeaponCollision(ECollisionEnabled::Type CollisionEnabled)
+{
+	if (EquippedWeapon && EquippedWeapon->GetWeaponCollisionBox())
+	{
+		EquippedWeapon->GetWeaponCollisionBox()->SetCollisionEnabled(CollisionEnabled);
+	}
 }
 
 void AMainCharacter::Attack(const FInputActionValue& Value)
