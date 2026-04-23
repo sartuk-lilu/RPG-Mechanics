@@ -31,12 +31,6 @@ public class RPG : ModuleRules
 			"RPG/Public/Items",
 			"RPG/Public/Debug",
 			"RPG/Public/Items/Weapons",
-			"RPG/Variant_Combat",
-			"RPG/Variant_Combat/AI",
-			"RPG/Variant_Combat/Animation",
-			"RPG/Variant_Combat/Gameplay",
-			"RPG/Variant_Combat/Interfaces",
-			"RPG/Variant_Combat/UI"
 		});
 
 		// Uncomment if you are using Slate UI

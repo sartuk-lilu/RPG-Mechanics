@@ -3,7 +3,6 @@
 .vs/
 Binaries/
 Build/
-Config/
 Content/
 DerivedDataCache/
 Intermediate/
@@ -11,9 +10,6 @@ Plugins/
 package/
 Saved/
 FeaturePacks/
-
-# Local project user settings
-Saved/Config/WindowsEditor/GameUserSettings.ini
 
 # Visual Studio files
 *.sln
@@ -44,6 +40,7 @@ Saved/Config/WindowsEditor/GameUserSettings.ini
 # Logs and dumps
 *.log
 *.dmp
+*.htm
 
 # Backup and temp
 *.tmp
