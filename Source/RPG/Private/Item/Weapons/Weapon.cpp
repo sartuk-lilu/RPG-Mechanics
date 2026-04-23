@@ -37,7 +37,7 @@ void AWeapon::AttachMeshToSocket(USceneComponent* InParent, FName InSocketName)
 void AWeapon::Equip(USceneComponent* InParent, FName InSocketName)
 {
 	AttachMeshToSocket(InParent, InSocketName);
-	EItemState = EItemState::Equipped;
+	EItemState = EItemState::EIS_Equipped;
 	if (EquipSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(

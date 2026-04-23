@@ -108,7 +108,7 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void AMainCharacter::Movement(const FInputActionValue& Value)
 {
 	
-	if (ActionState != EActionState::Unoccupied) return;
+	if (ActionState != EActionState::EAS_Unoccupied) return;
 	
 	FVector2D MovementVector = Value.Get<FVector2D>();
 	if (GetController() != nullptr)
@@ -161,7 +161,7 @@ void AMainCharacter::TakeItem(const FInputActionValue& Value)
 	{
 		OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"));
 		MoveIgnoreActorAdd(OverlappingWeapon);
-		CharacterState = ECharacterState::EquippedOneHandedWeapon;
+		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
 		EquippedWeapon = OverlappingWeapon;
 	}
 }
@@ -195,25 +195,25 @@ void AMainCharacter::PlayEquipMontage()
 {
 	if (!EquippedWeapon) return;
 	if (GetCharacterMovement()->IsFalling()) return;
-	if (ActionState == EActionState::Attacking) return;
+	if (ActionState == EActionState::EAS_Attacking) return;
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
 		if (EquipMontage)
 		{
 			AnimInstance->Montage_Play(EquipMontage);
-			ActionState = EActionState::Equipping;
+			ActionState = EActionState::EAS_Equipping;
 			switch (CharacterState)
 			{
-			case ECharacterState::Unarmed:
+			case ECharacterState::ECS_Unarmed:
 				AnimInstance->Montage_JumpToSection("Equip", EquipMontage);
-				CharacterState = ECharacterState::EquippedOneHandedWeapon;
+				CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
 				break;
-			case ECharacterState::EquippedOneHandedWeapon:
+			case ECharacterState::ECS_EquippedOneHandedWeapon:
 				AnimInstance->Montage_JumpToSection("Unequip", EquipMontage);
-				CharacterState = ECharacterState::Unarmed;
+				CharacterState = ECharacterState::ECS_Unarmed;
 				break;
 			default:
-				ActionState = EActionState::Unoccupied;
+				ActionState = EActionState::EAS_Unoccupied;
 				break;
 			}
 		}
@@ -222,7 +222,7 @@ void AMainCharacter::PlayEquipMontage()
 
 void AMainCharacter::AttackEnd()
 {
-	ActionState = EActionState::Unoccupied;
+	ActionState = EActionState::EAS_Unoccupied;
 }
 
 void AMainCharacter::Disarm()
@@ -243,15 +243,15 @@ void AMainCharacter::Arm()
 
 bool AMainCharacter::CanAttack() const
 {
-	return ActionState == EActionState::Unoccupied &&
-		CharacterState != ECharacterState::Unarmed &&
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState != ECharacterState::ECS_Unarmed &&
 			!GetCharacterMovement()->IsFalling(); 
 	
 }
 
 void AMainCharacter::EquipFinished()
 {
-	ActionState = EActionState::Unoccupied;
+	ActionState = EActionState::EAS_Unoccupied;
 }
 
 void AMainCharacter::SetWeaponCollision(ECollisionEnabled::Type CollisionEnabled)
@@ -267,7 +267,7 @@ void AMainCharacter::Attack(const FInputActionValue& Value)
 	if (CanAttack())
 	{
 		PlayAttackMontage();
-		ActionState = EActionState::Attacking;
+		ActionState = EActionState::EAS_Attacking;
 	}
 	
 }

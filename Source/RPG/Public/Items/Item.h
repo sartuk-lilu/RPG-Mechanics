@@ -10,8 +10,8 @@ class USphereComponent;
 
 enum class EItemState : uint8
 {
-	Hovering,
-	Equipped
+	EIS_Hovering UMETA(DisplayName = "Hovering"),
+	EIS_Equipped UMETA(DisplayName = "Equipped")
 };
 
 UCLASS()
@@ -46,7 +46,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* ItemMesh;		
 	
-	EItemState EItemState = EItemState::Hovering;
+	EItemState EItemState = EItemState::EIS_Hovering;
 	
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* Sphere;

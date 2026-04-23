@@ -163,8 +163,8 @@ private:
 	UAnimMontage* EquipMontage;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Montages", meta = (AllowPrivateAccess = "true"))
-	ECharacterState CharacterState = ECharacterState::Unarmed;
+	ECharacterState CharacterState = ECharacterState::ECS_Unarmed;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Montages", meta = (AllowPrivateAccess = "true"))
-	EActionState ActionState = EActionState::Unoccupied;
+	EActionState ActionState = EActionState::EAS_Unoccupied;
 };
